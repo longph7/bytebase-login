@@ -19,7 +19,6 @@ const getRedirectUri = () => {
     return 'http://localhost:5173/auth/github/callback';
   }
 };
-
 const REDIRECT_URI = getRedirectUri();
 
 // GitHub 用户信息接口
@@ -65,7 +64,7 @@ export class GitHubAuthService {
         client_id: CLIENT_ID,
         client_secret: CLIENT_SECRET,
         code: code,
-        redirect_uri: REDIRECT_URI
+        redirect_uri: REDIRECT_URI // 这里也要使用相同的回调地址
       }, {
         headers: {
           'Accept': 'application/json',
@@ -84,11 +83,7 @@ export class GitHubAuthService {
     }
   }
 
-  /**
-   * 使用访问令牌获取用户信息
-   * @param accessToken GitHub 访问令牌
-   * @returns 用户信息
-   */
+  // 以下代码保持不变...
   static async getUserInfo(accessToken: string): Promise<GitHubUser> {
     try {
       const response = await axios.get('https://api.github.com/user', {
@@ -105,11 +100,6 @@ export class GitHubAuthService {
     }
   }
 
-  /**
-   * 获取用户的邮箱地址（如果公开邮箱为空）
-   * @param accessToken GitHub 访问令牌
-   * @returns 用户邮箱列表
-   */
   static async getUserEmails(accessToken: string): Promise<any[]> {
     try {
       const response = await axios.get('https://api.github.com/user/emails', {
@@ -126,10 +116,6 @@ export class GitHubAuthService {
     }
   }
 
-  /**
-   * 发起 GitHub 登录
-   * 重定向到 GitHub 授权页面
-   */
   static initiateLogin(): void {
     const authUrl = this.getAuthUrl();
     console.log('GitHub OAuth URL:', authUrl);
@@ -147,20 +133,11 @@ export class GitHubAuthService {
     window.location.href = authUrl;
   }
 
-  /**
-   * 处理 GitHub OAuth 回调
-   * @param code 授权码
-   * @returns 完整的用户信息
-   */
   static async handleCallback(code: string): Promise<GitHubUser> {
     try {
-      // 获取访问令牌
       const accessToken = await this.getAccessToken(code);
-      
-      // 获取用户信息
       const userInfo = await this.getUserInfo(accessToken);
       
-      // 如果用户邮箱为空，尝试获取邮箱列表
       if (!userInfo.email) {
         const emails = await this.getUserEmails(accessToken);
         const primaryEmail = emails.find(email => email.primary);
@@ -169,7 +146,6 @@ export class GitHubAuthService {
         }
       }
 
-      // 将访问令牌和用户信息存储到本地存储
       localStorage.setItem('github_access_token', accessToken);
       localStorage.setItem('github_user', JSON.stringify(userInfo));
 
@@ -180,10 +156,6 @@ export class GitHubAuthService {
     }
   }
 
-  /**
-   * 获取本地存储的用户信息
-   * @returns 用户信息或 null
-   */
   static getStoredUser(): GitHubUser | null {
     try {
       const userStr = localStorage.getItem('github_user');
@@ -194,26 +166,15 @@ export class GitHubAuthService {
     }
   }
 
-  /**
-   * 获取本地存储的访问令牌
-   * @returns 访问令牌或 null
-   */
   static getStoredToken(): string | null {
     return localStorage.getItem('github_access_token');
   }
 
-  /**
-   * 登出用户，清除本地存储
-   */
   static logout(): void {
     localStorage.removeItem('github_access_token');
     localStorage.removeItem('github_user');
   }
 
-  /**
-   * 检查用户是否已登录
-   * @returns 是否已登录
-   */
   static isLoggedIn(): boolean {
     return !!(this.getStoredToken() && this.getStoredUser());
   }
