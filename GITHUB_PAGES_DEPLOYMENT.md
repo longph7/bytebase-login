@@ -54,9 +54,9 @@ git add .
 git commit -m "Initial commit: Bytebase login page with GitHub OAuth"
 
 # 添加远程仓库地址（替换为你的用户名和仓库名）
-git remote add origin https://github.com/你的用户名/bytebase-login.git
+git remote add origin https://github.com/longph7/bytebase-login.git
 
-# 推送到 GitHub
+
 git push -u origin main
 ```
 
