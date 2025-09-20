@@ -3,8 +3,6 @@ name: Deploy to GitHub Pages
 on:
   push:
     branches: [ main ]
-  pull_request:
-    branches: [ main ]
 
 # 设置并发控制，确保同时只有一个部署在运行
 concurrency:
@@ -79,5 +77,3 @@ jobs:
     - name: Deploy to GitHub Pages
       id: deployment
       uses: actions/deploy-pages@v4
-      # 只在推送到 main 分支时部署
-      if: github.ref == 'refs/heads/main' && github.event_name == 'push'
