@@ -1,9 +1,26 @@
+/**
+ * GitHub OAuth 认证服务
+ * 处理 GitHub OAuth 登录流程
+ */
+
 import axios from 'axios';
 
 // GitHub OAuth 配置
-const GITHUB_CLIENT_ID = import.meta.env.VITE_GITHUB_CLIENT_ID || 'your_github_client_id';
-const GITHUB_CLIENT_SECRET = import.meta.env.VITE_GITHUB_CLIENT_SECRET || 'your_github_client_secret';
-const REDIRECT_URI = `${window.location.origin}`;
+const CLIENT_ID = import.meta.env.VITE_GITHUB_CLIENT_ID || 'Ov23liEIfqA1p3w27SLR';
+const CLIENT_SECRET = import.meta.env.VITE_GITHUB_CLIENT_SECRET || '7b31ace978d5c31d49f8b1c1d8ff4bbbb9a13842';
+
+// 根据环境设置回调 URL
+const getRedirectUri = () => {
+  if (import.meta.env.PROD) {
+    // 生产环境：GitHub Pages URL
+    return 'https://longph7.github.io/bytebase-login/auth/github/callback';
+  } else {
+    // 开发环境：本地 URL
+    return 'http://localhost:5173/auth/github/callback';
+  }
+};
+
+const REDIRECT_URI = getRedirectUri();
 
 // GitHub 用户信息接口
 export interface GitHubUser {
@@ -28,7 +45,7 @@ export class GitHubAuthService {
    */
   static getAuthUrl(): string {
     const params = new URLSearchParams({
-      client_id: GITHUB_CLIENT_ID,
+      client_id: CLIENT_ID,
       redirect_uri: REDIRECT_URI,
       scope: 'user:email',
       state: Math.random().toString(36).substring(2, 15)
@@ -45,8 +62,8 @@ export class GitHubAuthService {
   static async getAccessToken(code: string): Promise<string> {
     try {
       const response = await axios.post('https://github.com/login/oauth/access_token', {
-        client_id: GITHUB_CLIENT_ID,
-        client_secret: GITHUB_CLIENT_SECRET,
+        client_id: CLIENT_ID,
+        client_secret: CLIENT_SECRET,
         code: code,
         redirect_uri: REDIRECT_URI
       }, {
@@ -116,13 +133,13 @@ export class GitHubAuthService {
   static initiateLogin(): void {
     const authUrl = this.getAuthUrl();
     console.log('GitHub OAuth URL:', authUrl);
-    console.log('Client ID:', GITHUB_CLIENT_ID);
+    console.log('Client ID:', CLIENT_ID);
     console.log('Redirect URI:', REDIRECT_URI);
     
     // 检查必要的配置是否存在
-     if (GITHUB_CLIENT_ID === 'your_github_client_id' || 
-         GITHUB_CLIENT_ID === 'your_github_client_id_here' ||
-         GITHUB_CLIENT_ID === 'test_client_id_placeholder') {
+     if (CLIENT_ID === 'your_github_client_id' || 
+         CLIENT_ID === 'your_github_client_id_here' ||
+         CLIENT_ID === 'test_client_id_placeholder') {
        alert('请先配置 GitHub OAuth 应用的 Client ID！\n\n请查看 GITHUB_OAUTH_SETUP.md 文件了解如何配置。');
        return;
      }

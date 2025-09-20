@@ -36,35 +36,15 @@ jobs:
         
     - name: Install dependencies
       run: npm ci
-      
-    # 验证环境变量是否存在（不会泄露实际值）
-    - name: Verify environment variables
-      run: |
-        if [ -z "$VITE_GITHUB_CLIENT_ID" ]; then
-          echo "❌ VITE_GITHUB_CLIENT_ID is not set"
-          exit 1
-        else
-          echo "✅ VITE_GITHUB_CLIENT_ID is set"
-        fi
-        if [ -z "$VITE_GITHUB_CLIENT_SECRET" ]; then
-          echo "❌ VITE_GITHUB_CLIENT_SECRET is not set"
-          exit 1
-        else
-          echo "✅ VITE_GITHUB_CLIENT_SECRET is set"
-        fi
-      env:
-        VITE_GITHUB_CLIENT_ID: ${{ secrets.VITE_GITHUB_CLIENT_ID }}
-        VITE_GITHUB_CLIENT_SECRET: ${{ secrets.VITE_GITHUB_CLIENT_SECRET }}
         
     - name: Build application
       run: npm run build
       env:
-        # GitHub OAuth 应用的客户端 ID（公开信息）
-        VITE_GITHUB_CLIENT_ID: ${{ secrets.VITE_GITHUB_CLIENT_ID }}
-        # GitHub OAuth 应用的客户端密钥（敏感信息）
-        VITE_GITHUB_CLIENT_SECRET: ${{ secrets.VITE_GITHUB_CLIENT_SECRET }}
         # 设置生产环境标识
         NODE_ENV: production
+        # 使用默认值进行构建，避免环境变量问题
+        VITE_GITHUB_CLIENT_ID: "placeholder"
+        VITE_GITHUB_CLIENT_SECRET: "placeholder"
         
     - name: Setup GitHub Pages
       uses: actions/configure-pages@v4

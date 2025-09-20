@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="./vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Bytebase Login - GitHub OAuth 登录</title>
+    <script>
+      // GitHub Pages SPA 路由回退解决方案
+      // 当访问 /auth/github/callback 时，重定向到根路径并保留查询参数
+      (function() {
+        var redirect = sessionStorage.redirect;
+        delete sessionStorage.redirect;
+        if (redirect && redirect !== location.href) {
+          history.replaceState(null, null, redirect);
+        }
+      })();
+      
+      // 如果是 OAuth 回调路径，重定向到根路径
+      if (window.location.pathname.includes('/auth/github/callback')) {
+        var search = window.location.search;
+        window.location.replace(window.location.origin + '/bytebase-login/' + search);
+      }
+    </script>
+  </head>
+  <body>
+    <div id="root">
+      <div style="display: flex; justify-content: center; align-items: center; height: 100vh; font-size: 18px; color: #666;">
+        正在重定向...
+      </div>
+    </div>
+    <script>
+      // 备用重定向方案
+      setTimeout(function() {
+        if (window.location.pathname.includes('/auth/github/callback')) {
+          window.location.href = window.location.origin + '/bytebase-login/' + window.location.search;
+        } else {
+          window.location.href = window.location.origin + '/bytebase-login/';
+        }
+      }, 1000);
+    </script>
+  </body>
+</html>
