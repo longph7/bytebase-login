@@ -3,7 +3,7 @@ import axios from 'axios';
 // GitHub OAuth 配置
 const GITHUB_CLIENT_ID = import.meta.env.VITE_GITHUB_CLIENT_ID || 'your_github_client_id';
 const GITHUB_CLIENT_SECRET = import.meta.env.VITE_GITHUB_CLIENT_SECRET || 'your_github_client_secret';
-const REDIRECT_URI = `${window.location.origin}/auth/github/callback`;
+const REDIRECT_URI = `${window.location.origin}`;
 
 // GitHub 用户信息接口
 export interface GitHubUser {
