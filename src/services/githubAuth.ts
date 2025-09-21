@@ -90,9 +90,14 @@ export class GitHubAuthService {
     }
   }
 
-  // 以下代码保持不变...
+  /**
+   * 获取 GitHub 用户信息
+   * @param accessToken GitHub 访问令牌
+   * @returns 用户信息
+   */
   static async getUserInfo(accessToken: string): Promise<GitHubUser> {
     try {
+      console.log('📡 正在从 GitHub API 获取用户信息...');
       const response = await axios.get('https://api.github.com/user', {
         headers: {
           'Authorization': `token ${accessToken}`,
@@ -100,9 +105,27 @@ export class GitHubAuthService {
         }
       });
 
-      return response.data as GitHubUser;
+      let user = response.data as GitHubUser;
+      console.log('👤 获取到用户基本信息:', user.login);
+
+      // 如果用户没有公开邮箱，尝试获取邮箱信息
+      if (!user.email) {
+        console.log('📧 用户邮箱未公开，尝试获取邮箱信息...');
+        try {
+          const emails = await this.getUserEmails(accessToken);
+          const primaryEmail = emails.find(email => email.primary);
+          if (primaryEmail) {
+            user.email = primaryEmail.email;
+            console.log('✅ 获取到用户主邮箱:', user.email);
+          }
+        } catch (emailError) {
+          console.warn('⚠️ 获取邮箱信息失败，但不影响登录:', emailError);
+        }
+      }
+
+      return user;
     } catch (error) {
-      console.error('获取 GitHub 用户信息时出错:', error);
+      console.error('❌ 获取 GitHub 用户信息时出错:', error);
       throw new Error('获取用户信息失败');
     }
   }

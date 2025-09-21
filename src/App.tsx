@@ -16,18 +16,52 @@ function App() {
   /**
    * 检查用户登录状态
    */
-  useEffect(() => {
+  const checkLoginStatus = () => {
     const storedUser = GitHubAuthService.getStoredUser();
     if (storedUser && GitHubAuthService.isLoggedIn()) {
+      console.log('✅ 检测到已登录用户:', storedUser.login);
       setUser(storedUser);
+    } else {
+      console.log('❌ 未检测到登录用户');
+      setUser(null);
     }
     setIsLoading(false);
+  };
+
+  /**
+   * 初始化时检查登录状态
+   */
+  useEffect(() => {
+    checkLoginStatus();
+  }, []);
+
+  /**
+   * 监听存储变化，当用户登录状态改变时更新UI
+   */
+  useEffect(() => {
+    const handleStorageChange = () => {
+      console.log('🔄 检测到存储变化，重新检查登录状态');
+      checkLoginStatus();
+    };
+
+    // 监听 localStorage 变化
+    window.addEventListener('storage', handleStorageChange);
+    
+    // 监听自定义事件（用于同一页面内的状态变化）
+    window.addEventListener('github-login-success', handleStorageChange);
+
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+      window.removeEventListener('github-login-success', handleStorageChange);
+    };
   }, []);
 
   /**
    * 处理用户登出
    */
   const handleLogout = () => {
+    console.log('🚪 用户登出');
+    GitHubAuthService.logout();
     setUser(null);
   };
 

@@ -27,8 +27,10 @@ const LoginPage: React.FC = () => {
       GitHubAuthService.handleCallback(code)
         .then(user => {
           console.log('GitHub 登录成功:', user);
-          // 刷新页面以更新应用状态
-          window.location.href = window.location.origin;
+          // 清除 URL 中的参数
+          window.history.replaceState({}, document.title, window.location.pathname);
+          // 触发自定义事件通知应用状态变化
+          window.dispatchEvent(new CustomEvent('github-login-success'));
         })
         .catch(error => {
           console.error('GitHub 登录失败:', error);
