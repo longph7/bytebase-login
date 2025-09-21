@@ -15,11 +15,14 @@ const getRedirectUri = () => {
     // 生产环境：GitHub Pages URL
     return 'https://longph7.github.io/bytebase-login/auth/github/callback';
   } else {
-    // 开发环境：本地 URL
-    return 'http://localhost:5173/auth/github/callback';
+    // 开发环境：本地 URL - 确保与 GitHub OAuth 应用设置中的回调 URL 一致
+    return 'http://localhost:5173/auth/github/callback/';
   }
 };
 const REDIRECT_URI = getRedirectUri();
+
+// 调试信息
+console.log('🔗 GitHub OAuth 回调 URL:', REDIRECT_URI);
 
 // GitHub 用户信息接口
 export interface GitHubUser {

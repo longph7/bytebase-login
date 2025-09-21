@@ -14,11 +14,12 @@
         // 获取当前 URL 的查询参数
         var search = window.location.search;
         
-        // 根据环境确定基础路径
+        // 根据环境确定基础路径和目标路径
         var basePath = window.location.hostname === 'localhost' ? '' : '/bytebase-login';
+        var targetPath = window.location.hostname === 'localhost' ? '/' : '/bytebase-login/';
         
         // 立即重定向到主应用页面
-        window.location.replace(window.location.origin + basePath + '/' + search);
+        window.location.replace(window.location.origin + targetPath + search);
       })();
     </script>
   </head>
@@ -38,7 +39,8 @@
       // 备用重定向方案，防止主脚本失败
       setTimeout(function() {
         var basePath = window.location.hostname === 'localhost' ? '' : '/bytebase-login';
-        window.location.href = window.location.origin + basePath + '/' + window.location.search;
+        var targetPath = window.location.hostname === 'localhost' ? '/' : '/bytebase-login/';
+        window.location.href = window.location.origin + targetPath + window.location.search;
       }, 2000);
     </script>
   </body>
