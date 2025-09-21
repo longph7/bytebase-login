@@ -31,7 +31,7 @@ jobs:
     - name: Setup Node.js environment
       uses: actions/setup-node@v4
       with:
-        node-version: '22'
+        node-version: '20'
         cache: 'npm'
         
     - name: Install dependencies
@@ -42,9 +42,9 @@ jobs:
       env:
         # 设置生产环境标识
         NODE_ENV: production
-        # 使用默认值进行构建，避免环境变量问题
-        VITE_GITHUB_CLIENT_ID: "placeholder"
-        VITE_GITHUB_CLIENT_SECRET: "placeholder"
+        # 从GitHub Secrets获取真实的OAuth配置
+        VITE_GITHUB_CLIENT_ID: ${{ secrets.VITE_GITHUB_CLIENT_ID }}
+        VITE_GITHUB_CLIENT_SECRET: ${{ secrets.VITE_GITHUB_CLIENT_SECRET }}
         
     - name: Setup GitHub Pages
       uses: actions/configure-pages@v4
