@@ -2,10 +2,8 @@
   "functions": {
     "api/**/*.js": {
       "runtime": "nodejs20.x"
-    },
-    "*.js": {
-      "runtime": "nodejs20.x"
     }
+    // 移除了 "*.js" 规则
   },
   "rewrites": [
     {
