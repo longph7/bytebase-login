@@ -17,28 +17,11 @@ const LoginPage: React.FC = () => {
   };
 
   /**
-   * 处理 GitHub OAuth 回调
+   * 处理 GitHub OAuth 回调 - 现在由App.tsx统一处理，这里移除重复逻辑
    */
   useEffect(() => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const code = urlParams.get('code');
-    
-    if (code) {
-      GitHubAuthService.handleCallback(code)
-        .then(user => {
-          console.log('GitHub 登录成功:', user);
-          // 清除 URL 中的参数
-          window.history.replaceState({}, document.title, window.location.pathname);
-          // 触发自定义事件通知应用状态变化
-          window.dispatchEvent(new CustomEvent('github-login-success'));
-        })
-        .catch(error => {
-          console.error('GitHub 登录失败:', error);
-          alert('GitHub 登录失败，请重试。');
-          // 清除 URL 中的参数
-          window.history.replaceState({}, document.title, window.location.pathname);
-        });
-    }
+    // OAuth回调现在由App.tsx统一处理，这里不再需要处理
+    // 保留这个useEffect以防将来需要其他初始化逻辑
   }, []);
 
   /**

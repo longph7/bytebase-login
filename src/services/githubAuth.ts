@@ -9,14 +9,14 @@ import axios from 'axios';
 const CLIENT_ID = import.meta.env.VITE_GITHUB_CLIENT_ID || 'Ov23liEIfqA1p3w27SLR';
 const CLIENT_SECRET = import.meta.env.VITE_GITHUB_CLIENT_SECRET || '7b31ace978d5c31d49f8b1c1d8ff4bbbb9a13842';
 
-// 根据环境设置回调 URL
+// 根据环境设置回调 URL - 现在指向Vercel无服务器函数
 const getRedirectUri = () => {
   if (import.meta.env.PROD) {
-    // 生产环境：GitHub Pages URL
-    return 'https://longph7.github.io/bytebase-login/auth/github/callback';
+    // 生产环境：Vercel函数URL
+    return 'https://bytebase-login.vercel.app/api/auth/github/redirect';
   } else {
-    // 开发环境：本地 URL - 确保与 GitHub OAuth 应用设置中的回调 URL 一致
-    return 'http://localhost:5173/auth/github/callback/';
+    // 开发环境：本地Vercel函数URL
+    return 'http://localhost:3000/api/auth/github/redirect';
   }
 };
 const REDIRECT_URI = getRedirectUri();
@@ -161,22 +161,32 @@ export class GitHubAuthService {
   }
 
   /**
-   * 处理 GitHub OAuth 回调
-   * @param code GitHub 返回的授权码
+   * 处理 GitHub OAuth 回调 - 现在通过URL参数获取用户信息
+   * @param urlParams URL参数对象
    * @returns 用户信息
    */
-  static async handleCallback(code: string): Promise<GitHubUser> {
+  static async handleCallback(urlParams: URLSearchParams): Promise<GitHubUser> {
     try {
-      console.log('🔄 处理 GitHub OAuth 回调，授权码:', code);
+      console.log('🔄 处理 GitHub OAuth 回调');
       
-      // 获取访问令牌
-      console.log('🔑 正在获取访问令牌...');
-      const accessToken = await this.getAccessToken(code);
-      console.log('✅ 访问令牌获取成功');
+      // 检查是否有错误
+      const error = urlParams.get('error');
+      if (error) {
+        const errorDescription = urlParams.get('error_description') || error;
+        throw new Error(`OAuth 授权失败: ${errorDescription}`);
+      }
+
+      // 检查是否有用户信息（来自Vercel函数）
+      const userStr = urlParams.get('user');
+      const token = urlParams.get('token');
       
-      // 获取用户信息
-      console.log('👤 正在获取用户信息...');
-      const user = await this.getUserInfo(accessToken);
+      if (!userStr || !token) {
+        throw new Error('未收到用户信息或访问令牌');
+      }
+
+      const user = JSON.parse(decodeURIComponent(userStr));
+      const accessToken = decodeURIComponent(token);
+      
       console.log('✅ 用户信息获取成功:', user.login);
       
       // 存储用户信息和令牌

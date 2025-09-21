@@ -29,10 +29,36 @@ function App() {
   };
 
   /**
-   * 初始化时检查登录状态
+   * 初始化时检查登录状态和处理OAuth回调
    */
   useEffect(() => {
-    checkLoginStatus();
+    // 检查URL参数是否包含OAuth回调信息
+    const urlParams = new URLSearchParams(window.location.search);
+    const authSuccess = urlParams.get('auth');
+    
+    if (authSuccess === 'success') {
+      // 处理OAuth成功回调
+      console.log('🔄 检测到OAuth回调，正在处理...');
+      setIsLoading(true);
+      
+      GitHubAuthService.handleCallback(urlParams)
+        .then((user) => {
+          console.log('✅ OAuth回调处理成功');
+          setUser(user);
+          // 清理URL参数
+          window.history.replaceState({}, document.title, window.location.pathname);
+        })
+        .catch((error) => {
+          console.error('❌ OAuth回调处理失败:', error);
+          alert(`登录失败: ${error.message}`);
+        })
+        .finally(() => {
+          setIsLoading(false);
+        });
+    } else {
+      // 正常检查登录状态
+      checkLoginStatus();
+    }
   }, []);
 
   /**
