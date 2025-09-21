@@ -50,7 +50,14 @@ export class GitHubAuthService {
       state: Math.random().toString(36).substring(2, 15)
     });
     
-    return `https://github.com/login/oauth/authorize?${params.toString()}`;
+    const authUrl = `https://github.com/login/oauth/authorize?${params}`;
+    
+    // 添加调试日志
+    console.log('🔗 生成 GitHub OAuth 授权 URL:', authUrl);
+    console.log('📍 重定向 URI:', REDIRECT_URI);
+    console.log('🆔 客户端 ID:', CLIENT_ID);
+    
+    return authUrl;
   }
 
   /**
@@ -116,42 +123,44 @@ export class GitHubAuthService {
     }
   }
 
+  /**
+   * 启动 GitHub 登录流程
+   * 重定向到 GitHub OAuth 授权页面
+   */
   static initiateLogin(): void {
+    console.log('🚀 启动 GitHub 登录流程...');
     const authUrl = this.getAuthUrl();
-    console.log('GitHub OAuth URL:', authUrl);
-    console.log('Client ID:', CLIENT_ID);
-    console.log('Redirect URI:', REDIRECT_URI);
-    
-    // 检查必要的配置是否存在
-     if (CLIENT_ID === 'your_github_client_id' || 
-         CLIENT_ID === 'your_github_client_id_here' ||
-         CLIENT_ID === 'test_client_id_placeholder') {
-       alert('请先配置 GitHub OAuth 应用的 Client ID！\n\n请查看 GITHUB_OAUTH_SETUP.md 文件了解如何配置。');
-       return;
-     }
-    
+    console.log('🔄 即将跳转到:', authUrl);
     window.location.href = authUrl;
   }
 
+  /**
+   * 处理 GitHub OAuth 回调
+   * @param code GitHub 返回的授权码
+   * @returns 用户信息
+   */
   static async handleCallback(code: string): Promise<GitHubUser> {
     try {
-      const accessToken = await this.getAccessToken(code);
-      const userInfo = await this.getUserInfo(accessToken);
+      console.log('🔄 处理 GitHub OAuth 回调，授权码:', code);
       
-      if (!userInfo.email) {
-        const emails = await this.getUserEmails(accessToken);
-        const primaryEmail = emails.find(email => email.primary);
-        if (primaryEmail) {
-          userInfo.email = primaryEmail.email;
-        }
-      }
-
-      localStorage.setItem('github_access_token', accessToken);
-      localStorage.setItem('github_user', JSON.stringify(userInfo));
-
-      return userInfo;
+      // 获取访问令牌
+      console.log('🔑 正在获取访问令牌...');
+      const accessToken = await this.getAccessToken(code);
+      console.log('✅ 访问令牌获取成功');
+      
+      // 获取用户信息
+      console.log('👤 正在获取用户信息...');
+      const user = await this.getUserInfo(accessToken);
+      console.log('✅ 用户信息获取成功:', user.login);
+      
+      // 存储用户信息和令牌
+      localStorage.setItem('github_user', JSON.stringify(user));
+      localStorage.setItem('github_token', accessToken);
+      console.log('💾 用户信息已保存到本地存储');
+      
+      return user;
     } catch (error) {
-      console.error('处理 GitHub 回调时出错:', error);
+      console.error('❌ 处理 GitHub 回调时出错:', error);
       throw error;
     }
   }

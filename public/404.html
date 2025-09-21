@@ -19,7 +19,9 @@
       // 如果是 OAuth 回调路径，重定向到根路径
       if (window.location.pathname.includes('/auth/github/callback')) {
         var search = window.location.search;
-        window.location.replace(window.location.origin + '/bytebase-login/' + search);
+        // 对于 GitHub Pages，重定向到项目根路径
+        var basePath = window.location.hostname === 'localhost' ? '' : '/bytebase-login';
+        window.location.replace(window.location.origin + basePath + '/' + search);
       }
     </script>
   </head>
@@ -33,9 +35,11 @@
       // 备用重定向方案
       setTimeout(function() {
         if (window.location.pathname.includes('/auth/github/callback')) {
-          window.location.href = window.location.origin + '/bytebase-login/' + window.location.search;
+          var basePath = window.location.hostname === 'localhost' ? '' : '/bytebase-login';
+          window.location.href = window.location.origin + basePath + '/' + window.location.search;
         } else {
-          window.location.href = window.location.origin + '/bytebase-login/';
+          var basePath = window.location.hostname === 'localhost' ? '' : '/bytebase-login';
+          window.location.href = window.location.origin + basePath + '/';
         }
       }, 1000);
     </script>
