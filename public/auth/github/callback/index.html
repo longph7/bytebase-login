@@ -11,15 +11,22 @@
        * 将 OAuth 回调重定向到主应用页面，并保留查询参数
        */
       (function() {
+        console.log('GitHub OAuth 回调页面加载');
+        console.log('当前 URL:', window.location.href);
+        
         // 获取当前 URL 的查询参数
         var search = window.location.search;
+        console.log('查询参数:', search);
         
-        // 根据环境确定基础路径和目标路径
-        var basePath = window.location.hostname === 'localhost' ? '' : '/bytebase-login';
-        var targetPath = window.location.hostname === 'localhost' ? '/' : '/bytebase-login/';
+        // 根据环境确定目标路径
+        var isLocalhost = window.location.hostname === 'localhost';
+        var targetPath = isLocalhost ? '/' : '/bytebase-login/';
+        var redirectUrl = window.location.origin + targetPath + search;
+        
+        console.log('重定向到:', redirectUrl);
         
         // 立即重定向到主应用页面
-        window.location.replace(window.location.origin + targetPath + search);
+        window.location.replace(redirectUrl);
       })();
     </script>
   </head>
@@ -38,9 +45,12 @@
     <script>
       // 备用重定向方案，防止主脚本失败
       setTimeout(function() {
-        var basePath = window.location.hostname === 'localhost' ? '' : '/bytebase-login';
-        var targetPath = window.location.hostname === 'localhost' ? '/' : '/bytebase-login/';
-        window.location.href = window.location.origin + targetPath + window.location.search;
+        console.log('备用重定向方案触发');
+        var isLocalhost = window.location.hostname === 'localhost';
+        var targetPath = isLocalhost ? '/' : '/bytebase-login/';
+        var redirectUrl = window.location.origin + targetPath + window.location.search;
+        console.log('备用重定向到:', redirectUrl);
+        window.location.href = redirectUrl;
       }, 2000);
     </script>
   </body>
