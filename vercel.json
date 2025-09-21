@@ -1,12 +1,12 @@
 {
   "functions": {
     "api/**/*.js": {
-      "runtime": "nodejs20.x"
+      "runtime": "@vercel/node@2.15.10"
     }
   },
   "rewrites": [
     {
-      "source": "/(.*)",
+      "source": "/((?!api|_next|favicon.ico).*)",
       "destination": "/index.html"
     }
   ]
