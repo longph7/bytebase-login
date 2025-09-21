@@ -202,11 +202,11 @@ export class GitHubAuthService {
   }
 
   static getStoredToken(): string | null {
-    return localStorage.getItem('github_access_token');
+    return localStorage.getItem('github_token');
   }
 
   static logout(): void {
-    localStorage.removeItem('github_access_token');
+    localStorage.removeItem('github_token');
     localStorage.removeItem('github_user');
   }
 
